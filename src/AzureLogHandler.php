@@ -41,7 +41,6 @@ class AzureLogHandler extends AbstractHandler
         $array[] = "AccountKey=" . $account_key;
         !empty($queue_endpoint) && $array[] = 'QueueEndpoint=' . $queue_endpoint;
         $this->connection_string = implode(';', $array);
-        //$this->client = QueueRestProxy::createQueueService($connection_string);
         $this->my_formatter = $formatter;
 
     }
@@ -61,6 +60,12 @@ class AzureLogHandler extends AbstractHandler
     public function getClient()
     {
         return $this->client ?? $this->client = QueueRestProxy::createQueueService($this->connection_string);
+    }
+
+
+    public function getFormatter()
+    {
+        return empty($this->my_formatter) ? new Formatter() : new $this->my_formatter();
     }
 
 
@@ -87,15 +92,6 @@ class AzureLogHandler extends AbstractHandler
     }
 
 
-    public function getFormatter()
-    {
-        return empty($this->my_formatter) ? parent::getFormatter() : new $this->my_formatter();
-    }
-
-    public function getDefaultFormatter()
-    {
-        return new Formatter();
-    }
 
     private function sendMessageToQueue(string $message)
     {
